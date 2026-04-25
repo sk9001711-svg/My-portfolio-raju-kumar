@@ -436,7 +436,6 @@ input[type=range]#cpZoom::-moz-range-thumb {
 (function () {
   'use strict';
 
-  /* ── DOM refs ─────────────────────────────────── */
   const fileInput   = document.getElementById('cpFileInput');
   const overlay     = document.getElementById('cpOverlay');
   const cpImg       = document.getElementById('cpImg');
@@ -445,93 +444,101 @@ input[type=range]#cpZoom::-moz-range-thumb {
   const zoomSlider  = document.getElementById('cpZoom');
   const fillBar     = document.getElementById('cpFill');
 
-  let cropper   = null;
-  let fitZoom   = 0.1;   // initial "fit" ratio — set in ready()
+  let cropper  = null;
+  let minRatio = 0.01;
+  let maxRatio = 3;
 
-  /* ── Helpers ──────────────────────────────────── */
-  const minZoomMult = 0.9;   // 0.9× fit
-  const maxZoomMult = 4.0;   // 4× fit
+  /* ─────────────────────────────────────────────────
+     FIX 1: prevent page scroll while modal is open
+     Using non-passive listeners so preventDefault works
+  ───────────────────────────────────────────────── */
+  overlay.addEventListener('wheel',     function (e) { e.preventDefault(); }, { passive: false });
+  overlay.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
-  function zoomToSlider(ratio) {
-    const min = fitZoom * minZoomMult;
-    const max = fitZoom * maxZoomMult;
-    return Math.min(100, Math.max(0, Math.round(((ratio - min) / (max - min)) * 100)));
-  }
-  function sliderToZoom(pct) {
-    const min = fitZoom * minZoomMult;
-    const max = fitZoom * maxZoomMult;
-    return min + (pct / 100) * (max - min);
-  }
-  function setFill(pct) {
-    fillBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
-  }
-
-  /* ── Init cropper ─────────────────────────────── */
-  function initCropper(src) {
-    cpImg.src = src;
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    if (cropper) { cropper.destroy(); cropper = null; }
-
-    cropper = new Cropper(cpImg, {
-      aspectRatio   : 1,
-      viewMode      : 1,
-      dragMode      : 'move',
-      autoCropArea  : 0.82,
-      cropBoxMovable   : false,
-      cropBoxResizable : false,
-      toggleDragModeOnDblclick: false,
-      guides        : false,
-      center        : false,
-      highlight     : false,
-      preview       : '.cp-preview',
-
-      ready() {
-        /* Apply circular crop-box via DOM ───────── */
-        const wrap = cpImg.parentElement;
-        const vb = wrap.querySelector('.cropper-view-box');
-        const fc = wrap.querySelector('.cropper-face');
-        if (vb) {
-          vb.style.cssText += 'border-radius:50%!important;outline:none!important;box-shadow:0 0 0 2px #e2b04a,0 0 0 4000px rgba(0,0,0,.52)!important;';
-        }
-        if (fc) fc.style.cssText += 'border-radius:50%!important;background:transparent!important;';
-        wrap.querySelectorAll('.cropper-dashed,.cropper-point,.cropper-line')
-            .forEach(el => el.style.display = 'none');
-
-        /* Record fit zoom, set slider ────────────── */
-        const d = cropper.getImageData();
-        fitZoom = d.width / d.naturalWidth;
-
-        const initPct = zoomToSlider(fitZoom);
-        zoomSlider.value = initPct;
-        setFill(initPct);
-      },
-
-      zoom(e) {
-        const pct = zoomToSlider(e.detail.ratio);
-        zoomSlider.value = pct;
-        setFill(pct);
-      },
-    });
-  }
-
-  /* ── File selected → open cropper ────────────── */
+  /* ── File selected → read → open ─────────────── */
   fileInput.addEventListener('change', function () {
     const file = this.files && this.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = e => initCropper(e.target.result);
+    reader.onload = e => openModal(e.target.result);
     reader.readAsDataURL(file);
   });
 
-  /* ── Zoom slider ──────────────────────────────── */
+  /* ── Open modal & init Cropper ─────────────────── */
+  function openModal(src) {
+    if (cropper) { cropper.destroy(); cropper = null; }
+    cpImg.src = src;
+    overlay.classList.add('open');
+
+    cropper = new Cropper(cpImg, {
+      aspectRatio             : 1,
+      viewMode                : 1,
+      dragMode                : 'move',
+      autoCropArea            : 0.82,
+      cropBoxMovable          : false,
+      cropBoxResizable        : false,
+      toggleDragModeOnDblclick: false,
+      guides                  : false,
+      center                  : false,
+      highlight               : false,
+      background              : false,
+      preview                 : '.cp-preview',
+      /* FIX 2: explicitly enable wheel & touch zoom */
+      zoomOnWheel             : true,
+      wheelZoomRatio          : 0.08,
+      zoomOnTouch             : true,
+
+      ready() {
+        /* FIX 3: correct DOM selectors — search inside
+           #cpOverlay, not from cpImg.parentElement      */
+        const vb = overlay.querySelector('.cropper-view-box');
+        const fc = overlay.querySelector('.cropper-face');
+        if (vb) {
+          vb.style.borderRadius = '50%';
+          vb.style.outline      = 'none';
+          vb.style.boxShadow    = '0 0 0 2px #e2b04a,0 0 0 4000px rgba(0,0,0,.55)';
+        }
+        if (fc) {
+          fc.style.borderRadius = '50%';
+          fc.style.background   = 'transparent';
+        }
+        overlay.querySelectorAll('.cropper-dashed,.cropper-point,.cropper-line')
+                .forEach(el => (el.style.display = 'none'));
+
+        /* FIX 4: derive zoom range from actual image data */
+        const img = cropper.getImageData();
+        const fit = img.width / img.naturalWidth;
+        minRatio  = fit * 0.8;
+        maxRatio  = fit * 5;
+        syncSlider(fit);
+      },
+
+      /* FIX 5: zoom event always updates the slider */
+      zoom(e) {
+        syncSlider(e.detail.ratio);
+      },
+    });
+  }
+
+  /* ── Slider ↔ zoom ratio helpers ─────────────── */
+  function syncSlider(ratio) {
+    const pct = Math.min(100, Math.max(0,
+      ((ratio - minRatio) / (maxRatio - minRatio)) * 100
+    ));
+    zoomSlider.value      = pct;
+    fillBar.style.width   = pct + '%';
+  }
+
   zoomSlider.addEventListener('input', function () {
-    if (cropper) cropper.zoomTo(sliderToZoom(+this.value));
-    setFill(+this.value);
+    if (!cropper) return;
+    const ratio = minRatio + (+this.value / 100) * (maxRatio - minRatio);
+    cropper.zoomTo(ratio);
+    fillBar.style.width = this.value + '%';
   });
-  document.getElementById('cpZoomIn') .addEventListener('click', () => cropper && cropper.zoom( 0.08));
-  document.getElementById('cpZoomOut').addEventListener('click', () => cropper && cropper.zoom(-0.08));
+
+  /* ── Zoom buttons ─────────────────────────────── */
+  document.getElementById('cpZoomIn') .addEventListener('click', () => cropper && cropper.zoom( 0.1));
+  document.getElementById('cpZoomOut').addEventListener('click', () => cropper && cropper.zoom(-0.1));
 
   /* ── Tool buttons ─────────────────────────────── */
   document.getElementById('cpRotL') .addEventListener('click', () => cropper && cropper.rotate(-90));
@@ -543,46 +550,42 @@ input[type=range]#cpZoom::-moz-range-thumb {
   document.getElementById('cpReset').addEventListener('click', () => {
     if (!cropper) return;
     cropper.reset();
-    const pct = zoomToSlider(fitZoom);
-    zoomSlider.value = pct;
-    setFill(pct);
+    const img = cropper.getImageData();
+    syncSlider(img.width / img.naturalWidth);
   });
 
-  /* ── Apply ─────────────────────────────────────── */
+  /* ── Apply crop ────────────────────────────────── */
   document.getElementById('cpApply').addEventListener('click', function () {
     if (!cropper) return;
-
-    // Show loading state
     this.textContent = 'Processing…';
-    this.disabled = true;
-
-    const canvas = cropper.getCroppedCanvas({
-      width: 400, height: 400,
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: 'high',
-    });
-
-    const dataURL = canvas.toDataURL('image/jpeg', 0.92);
-    croppedData.value = dataURL;
-    avPreview.src     = dataURL;          // Instant live avatar update
-
-    this.textContent = 'Set Photo ✓';
-    this.disabled = false;
-    closeModal();
+    this.disabled    = true;
+    /* Small timeout lets the browser paint the "Processing" label */
+    setTimeout(() => {
+      const canvas = cropper.getCroppedCanvas({
+        width: 400, height: 400,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      });
+      const url          = canvas.toDataURL('image/jpeg', 0.92);
+      croppedData.value  = url;
+      avPreview.src      = url;
+      this.textContent   = 'Set Photo ✓';
+      this.disabled      = false;
+      closeModal();
+    }, 30);
   });
 
-  /* ── Close / cancel ───────────────────────────── */
+  /* ── Close helpers ─────────────────────────────── */
   function closeModal() {
     overlay.classList.remove('open');
-    document.body.style.overflow = '';
     fileInput.value = '';
   }
   document.getElementById('cpCancel').addEventListener('click', closeModal);
   document.getElementById('cpClose') .addEventListener('click', closeModal);
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-
-  /* ── Keyboard ESC ─────────────────────────────── */
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
 
 })();
 </script>
