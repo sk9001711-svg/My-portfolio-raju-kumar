@@ -1,0 +1,31 @@
+{% extends 'blog/dashboard_base.html' %}
+{% block title %}Manage Gallery{% endblock %}
+{% block dashboard_content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <h2 style="color:var(--white);font-family:'Playfair Display',serif">🖼 Gallery Photos</h2>
+  <a href="{% url 'gallery_create' %}" class="btn btn-primary btn-sm">+ Upload Photo</a>
+</div>
+<div class="dashboard-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Photo</th><th>Title</th><th>Description</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for photo in photos %}
+        <tr>
+          <td><img src="{{ photo.image.url }}" alt="{{ photo.title }}"></td>
+          <td style="color:var(--white);font-weight:500">{{ photo.title }}</td>
+          <td>{{ photo.description|truncatewords:8 }}</td>
+          <td>{{ photo.date|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url 'gallery_edit' photo.pk %}" class="btn btn-sm btn-outline" style="color:var(--accent);border-color:var(--accent)">Edit</a>
+            <a href="{% url 'gallery_delete' photo.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;padding:40px">No photos yet. Upload your first one!</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

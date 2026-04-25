@@ -1,0 +1,36 @@
+{% extends 'blog/dashboard_base.html' %}
+{% block title %}Manage Categories{% endblock %}
+{% block dashboard_content %}
+<h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">📁 Categories</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+  <div class="dashboard-card">
+    <h3>Add New Category</h3>
+    <form method="POST">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-sm">Add Category</button>
+    </form>
+  </div>
+
+  <div class="dashboard-card">
+    <h3>Existing Categories</h3>
+    {% for cat in categories %}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-glass)">
+      <div>
+        <span style="color:var(--white);font-weight:500">{{ cat.name }}</span>
+        <span style="color:var(--text-muted);font-size:.8rem;margin-left:8px">({{ cat.post_count }} posts)</span>
+      </div>
+      <a href="{% url 'category_delete' cat.pk %}" class="btn btn-sm btn-danger">Delete</a>
+    </div>
+    {% empty %}
+    <p style="color:var(--text-muted)">No categories yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

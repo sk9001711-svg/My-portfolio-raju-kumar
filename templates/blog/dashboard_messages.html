@@ -1,0 +1,29 @@
+{% extends 'blog/dashboard_base.html' %}
+{% block title %}Messages{% endblock %}
+{% block dashboard_content %}
+<h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">💬 Contact Messages</h2>
+<div class="dashboard-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Status</th><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for msg in contact_messages %}
+        <tr>
+          <td>{% if msg.is_read %}<span style="color:var(--text-muted)">Read</span>{% else %}<span style="color:var(--success);font-weight:600">New</span>{% endif %}</td>
+          <td style="color:var(--white)">{{ msg.name }}</td>
+          <td>{{ msg.email }}</td>
+          <td>{{ msg.message|truncatewords:10 }}</td>
+          <td>{{ msg.created_at|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url 'message_detail' msg.pk %}" class="btn btn-sm btn-outline">View</a>
+            <a href="{% url 'message_delete' msg.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;padding:40px">No messages yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

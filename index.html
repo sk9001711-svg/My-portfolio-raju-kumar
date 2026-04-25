@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr. Raju Maurya | Student • Blogger • Political Science Learner</title>
+  <meta name="description" content="Personal portfolio and blog of Mr. Raju Maurya – a student pursuing BA & B.Ed (Hons. Political Science) from Sasaram, Bihar. Read blogs on education, politics, and society.">
+  <meta name="keywords" content="Raju Maurya, Political Science, Student Blog, Education, Bihar, Sasaram">
+  <meta name="author" content="Mr. Raju Maurya">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="#" class="nav-logo">Raju Maurya</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#hero" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <img src="images/hero-bg.png" alt="Background">
+  </div>
+  <div class="hero-particles" id="heroParticles"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <p class="hero-greeting">Welcome to my world</p>
+      <h1 class="hero-name">Mr. <span>Raju Maurya</span></h1>
+      <p class="hero-title">Student &nbsp;|&nbsp; Political Science Learner &nbsp;|&nbsp; Blogger</p>
+      <p class="hero-tagline">"Sharing thoughts, learning, and perspectives on education, society, and public life."</p>
+      <div class="hero-buttons">
+        <a href="#blog" class="btn btn-primary">📖 Read Blogs</a>
+        <a href="#contact" class="btn btn-outline">✉ Contact Me</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="hero-image-wrapper">
+        <img src="images/profile.jpg" alt="Mr. Raju Maurya" id="heroProfileImg">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">About Me</span>
+      <h2 class="section-title">Know Who I Am</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-image-wrapper fade-up">
+        <img src="images/about.jpg" alt="About Raju Maurya">
+      </div>
+      <div class="about-content fade-up">
+        <h3>Hello, I'm Raju Maurya 👋</h3>
+        <p>Mr. Raju Maurya is a dedicated student pursuing BA &amp; B.Ed with Honours in Political Science. He is interested in education, society, politics, public awareness, and sharing meaningful ideas through writing.</p>
+        <p>This website is created to present his academic journey, thoughts, blogs, and personal updates with the public. Through his writing, he aims to inspire fellow students and contribute to meaningful discourse on education and social issues.</p>
+        <div class="about-stats">
+          <div class="stat-item">
+            <div class="stat-number" id="statBlogs">5+</div>
+            <div class="stat-label">Blog Posts</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">BA &amp; B.Ed</div>
+            <div class="stat-label">Education</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">Bihar</div>
+            <div class="stat-label">Location</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EDUCATION ===== -->
+<section class="section" id="education" style="background: var(--primary);">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">Education</span>
+      <h2 class="section-title">My Academic Journey</h2>
+      <p class="section-desc">Pursuing knowledge in political science and education to make a meaningful impact.</p>
+    </div>
+    <div class="education-cards">
+      <div class="edu-card fade-up">
+        <div class="edu-icon">🎓</div>
+        <h3>BA &amp; B.Ed</h3>
+        <p class="edu-detail"><span>Honours:</span> Political Science</p>
+        <p class="edu-detail"><span>Status:</span> Currently Pursuing</p>
+        <p class="edu-detail"><span>Location:</span> Bihar, India</p>
+      </div>
+      <div class="edu-card fade-up">
+        <div class="edu-icon">📚</div>
+        <h3>Areas of Interest</h3>
+        <p class="edu-detail"><span>Primary:</span> Political Science &amp; Governance</p>
+        <p class="edu-detail"><span>Secondary:</span> Education &amp; Social Awareness</p>
+        <p class="edu-detail"><span>Writing:</span> Blogging &amp; Public Discourse</p>
+      </div>
+      <div class="edu-card fade-up">
+        <div class="edu-icon">🎯</div>
+        <h3>Future Goals</h3>
+        <p class="edu-detail"><span>Career:</span> Education &amp; Public Service</p>
+        <p class="edu-detail"><span>Mission:</span> Inspire through Knowledge</p>
+        <p class="edu-detail"><span>Vision:</span> Educated &amp; Aware Society</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BLOG ===== -->
+<section class="section" id="blog">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">Blog</span>
+      <h2 class="section-title">My Latest Articles</h2>
+      <p class="section-desc">Thoughts and perspectives on education, politics, and society.</p>
+    </div>
+    <div class="blog-filters fade-up">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="Education">Education</button>
+      <button class="filter-btn" data-filter="Political Science">Political Science</button>
+      <button class="filter-btn" data-filter="Social Awareness">Social Awareness</button>
+      <button class="filter-btn" data-filter="Student Life">Student Life</button>
+      <button class="filter-btn" data-filter="Personal Thoughts">Personal Thoughts</button>
+      <button class="filter-btn" data-filter="Current Issues">Current Issues</button>
+    </div>
+    <div class="blog-grid" id="blogGrid">
+      <!-- Blog cards rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== GALLERY ===== -->
+<section class="section" id="gallery" style="background: var(--primary);">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">Gallery</span>
+      <h2 class="section-title">Photo Gallery</h2>
+      <p class="section-desc">Moments captured along the journey.</p>
+    </div>
+    <div class="gallery-grid fade-up" id="galleryGrid">
+      <!-- Gallery items rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">Contact</span>
+      <h2 class="section-title">Get in Touch</h2>
+      <p class="section-desc">Have a question or want to connect? Feel free to reach out.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info-cards fade-up">
+        <div class="contact-card">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h4>Email</h4>
+            <p>sk9001711@gmail.com</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4>Phone</h4>
+            <p>+91 9135030137</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h4>Location</h4>
+            <p>Sasaram, Bihar, India</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">🎓</div>
+          <div>
+            <h4>Status</h4>
+            <p>Student – BA &amp; B.Ed (Hons. Political Science)</p>
+          </div>
+        </div>
+      </div>
+      <form class="contact-form fade-up" id="contactForm">
+        <div class="form-group">
+          <label for="contactName">Your Name</label>
+          <input type="text" id="contactName" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+          <label for="contactEmail">Your Email</label>
+          <input type="email" id="contactEmail" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label for="contactMessage">Your Message</label>
+          <textarea id="contactMessage" placeholder="Write your message here..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content: center;">Send Message</button>
+        <div class="form-success" id="formSuccess">✅ Thank you! Your message has been sent successfully.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Raju Maurya</h3>
+        <p>Sharing thoughts, learning, and perspectives on education, society, and public life. A personal space for ideas, growth, and meaningful discourse.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#education">Education</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Blog Categories</h4>
+        <ul class="footer-links">
+          <li><a href="#blog">Education</a></li>
+          <li><a href="#blog">Political Science</a></li>
+          <li><a href="#blog">Social Awareness</a></li>
+          <li><a href="#blog">Student Life</a></li>
+          <li><a href="#blog">Current Issues</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Mr. Raju Maurya. All rights reserved. | Crafted with ❤️</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== BLOG MODAL ===== -->
+<div class="blog-modal" id="blogModal">
+  <button class="blog-modal-close" id="blogModalClose">✕</button>
+  <div class="blog-modal-content">
+    <div class="blog-modal-image"><img id="blogModalImg" src="" alt=""></div>
+    <div class="blog-modal-body">
+      <span class="blog-card-category" id="blogModalCategory"></span>
+      <h2 id="blogModalTitle"></h2>
+      <p class="blog-card-date" id="blogModalDate"></p>
+      <div class="blog-content" id="blogModalContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-info">
+    <h4 id="lightboxTitle"></h4>
+    <p id="lightboxDesc"></p>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<button class="admin-float" id="adminFloatBtn" title="Admin Panel">⚙</button>
+
+<div class="admin-overlay" id="adminOverlay">
+  <!-- Login -->
+  <div class="admin-login" id="adminLogin">
+    <h2>🔐 Admin Login</h2>
+    <p>Enter password to manage your content</p>
+    <div class="admin-message" id="loginMessage"></div>
+    <div class="admin-form-group">
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" placeholder="Enter admin password">
+    </div>
+    <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top: 8px;" id="adminLoginBtn">Login</button>
+  </div>
+
+  <!-- Panel -->
+  <div class="admin-panel" id="adminPanel" style="display:none;">
+    <div class="admin-header">
+      <h2>⚙ Admin Panel</h2>
+      <button class="admin-close" id="adminCloseBtn">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="blogTab">📝 Blogs</button>
+      <button class="admin-tab" data-tab="galleryTab">🖼 Gallery</button>
+      <button class="admin-tab" data-tab="profileTab">👤 Profile</button>
+    </div>
+    <div class="admin-body">
+      <!-- Blog Tab -->
+      <div class="admin-section active" id="blogTab">
+        <div class="admin-message" id="blogMessage"></div>
+        <h3 style="color:var(--white); margin-bottom:20px; font-family:'Playfair Display',serif;">Add New Blog Post</h3>
+        <div class="admin-form-group">
+          <label>Blog Title</label>
+          <input type="text" id="blogTitleInput" placeholder="Enter blog title">
+        </div>
+        <div class="admin-form-row">
+          <div class="admin-form-group">
+            <label>Category</label>
+            <select id="blogCategoryInput">
+              <option value="Education">Education</option>
+              <option value="Political Science">Political Science</option>
+              <option value="Social Awareness">Social Awareness</option>
+              <option value="Student Life">Student Life</option>
+              <option value="Personal Thoughts">Personal Thoughts</option>
+              <option value="Current Issues">Current Issues</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>Date</label>
+            <input type="date" id="blogDateInput">
+          </div>
+        </div>
+        <div class="admin-form-group">
+          <label>Featured Image (URL or upload)</label>
+          <input type="file" id="blogImageFile" accept="image/*" style="padding:10px;">
+          <input type="text" id="blogImageUrl" placeholder="Or paste image URL" style="margin-top:8px;">
+          <img class="admin-image-preview" id="blogImagePreview" style="display:none;">
+        </div>
+        <div class="admin-form-group">
+          <label>Content</label>
+          <textarea id="blogContentInput" placeholder="Write your blog content here... Use double line breaks for paragraphs."></textarea>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn-admin btn-admin-primary" id="saveBlogBtn">Publish Blog</button>
+          <button class="btn-admin btn-admin-danger" id="cancelBlogEdit" style="display:none;">Cancel Edit</button>
+        </div>
+        <input type="hidden" id="editBlogId" value="">
+        <div class="admin-list" id="adminBlogList"></div>
+      </div>
+
+      <!-- Gallery Tab -->
+      <div class="admin-section" id="galleryTab">
+        <div class="admin-message" id="galleryMessage"></div>
+        <h3 style="color:var(--white); margin-bottom:20px; font-family:'Playfair Display',serif;">Upload New Photo</h3>
+        <div class="admin-form-group">
+          <label>Photo Title</label>
+          <input type="text" id="galleryTitleInput" placeholder="Enter photo title">
+        </div>
+        <div class="admin-form-group">
+          <label>Description</label>
+          <input type="text" id="galleryDescInput" placeholder="Short description">
+        </div>
+        <div class="admin-form-group">
+          <label>Photo (Upload or URL)</label>
+          <input type="file" id="galleryImageFile" accept="image/*" style="padding:10px;">
+          <input type="text" id="galleryImageUrl" placeholder="Or paste image URL" style="margin-top:8px;">
+          <img class="admin-image-preview" id="galleryImagePreview" style="display:none;">
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn-admin btn-admin-primary" id="saveGalleryBtn">Add Photo</button>
+          <button class="btn-admin btn-admin-danger" id="cancelGalleryEdit" style="display:none;">Cancel Edit</button>
+        </div>
+        <input type="hidden" id="editGalleryId" value="">
+        <div class="admin-list" id="adminGalleryList"></div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div class="admin-section" id="profileTab">
+        <div class="admin-message" id="profileMessage"></div>
+        <h3 style="color:var(--white); margin-bottom:20px; font-family:'Playfair Display',serif;">Update Profile Photo</h3>
+        <div class="admin-form-group">
+          <label>Profile Photo</label>
+          <input type="file" id="profileImageFile" accept="image/*" style="padding:10px;">
+          <img class="admin-image-preview" id="profileImagePreview" style="display:none;">
+        </div>
+        <button class="btn-admin btn-admin-primary" id="saveProfileBtn">Update Profile</button>
+        <h3 style="color:var(--white); margin:32px 0 20px; font-family:'Playfair Display',serif;">Change Admin Password</h3>
+        <div class="admin-form-group">
+          <label>New Password</label>
+          <input type="password" id="newPasswordInput" placeholder="Enter new password">
+        </div>
+        <button class="btn-admin btn-admin-primary" id="changePasswordBtn">Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{% extends 'blog/dashboard_base.html' %}
+{% load static %}
+{% block title %}Edit Profile{% endblock %}
+{% block dashboard_content %}
+<div class="form-page">
+  <h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">👤 Edit Site Profile</h2>
+  <div class="dashboard-card">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Profile Image -->
+      <div class="form-group">
+        <label>Profile Photo</label>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" alt="Current profile photo"
+               style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)">
+          {% else %}
+          <img src="{% static 'images/profile.jpg' %}" alt="Default"
+               style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border-glass)">
+          {% endif %}
+          <div style="flex:1">
+            <input type="file" name="profile_image" class="form-input" accept="image/*">
+            <p style="color:var(--text-muted);font-size:.8rem;margin-top:6px">JPG, PNG recommended. Leave blank to keep current.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" value="{{ profile.name }}" class="form-input"
+                 placeholder="Mr. Raju Maurya" required>
+        </div>
+        <div class="form-group">
+          <label>Title / Role *</label>
+          <input type="text" name="title" value="{{ profile.title }}" class="form-input"
+                 placeholder="Student | Blogger" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tagline / Quote</label>
+        <input type="text" name="tagline" value="{{ profile.tagline }}" class="form-input"
+               placeholder="A short inspirational quote or tagline">
+      </div>
+
+      <div class="form-group">
+        <label>About Text</label>
+        <textarea name="about_text" rows="5" class="form-input"
+                  placeholder="Write a short bio about yourself...">{{ profile.about_text }}</textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" name="email" value="{{ profile.email }}" class="form-input"
+                 placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" name="phone" value="{{ profile.phone }}" class="form-input"
+                 placeholder="9XXXXXXXXX">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" value="{{ profile.location }}" class="form-input"
+                 placeholder="City, State">
+        </div>
+        <div class="form-group">
+          <label>Education</label>
+          <input type="text" name="education" value="{{ profile.education }}" class="form-input"
+                 placeholder="BA & B.Ed (Hons. Political Science)">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+        <a href="{% url 'home' %}" class="btn btn-outline" target="_blank">🌐 View Site</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

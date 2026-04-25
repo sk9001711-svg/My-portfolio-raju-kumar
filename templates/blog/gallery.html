@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Gallery | {{ site_profile.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <span class="section-label">Gallery</span>
+    <h1>Photo Gallery</h1>
+    <p>Moments captured along the journey.</p>
+  </div>
+</div>
+<section class="section" style="padding-top:40px">
+  <div class="container">
+    <div class="gallery-grid">
+      {% for photo in photos %}
+      <div class="gallery-item fade-up" onclick="openLightbox('{{ photo.image.url }}', '{{ photo.title }}')">
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+        <div class="gallery-overlay">
+          <h4>{{ photo.title }}</h4>
+          <p>{{ photo.description|truncatewords:10 }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <p style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:60px 0">No photos yet. Check back soon!</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

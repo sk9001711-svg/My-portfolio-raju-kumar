@@ -1,0 +1,30 @@
+{% extends 'blog/dashboard_base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block dashboard_content %}
+<div class="form-page">
+  <h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">{{ title }}</h2>
+  <div class="dashboard-card">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<p style="color:var(--text-muted);font-size:.8rem;margin-top:4px">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<p style="color:var(--danger);font-size:.8rem;margin-top:4px">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      {% if blog and blog.featured_image %}
+      <div class="form-group">
+        <label>Current Image</label>
+        <img src="{{ blog.featured_image.url }}" alt="" style="max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--border-glass)">
+      </div>
+      {% endif %}
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'dashboard_blogs' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'blog/dashboard_base.html' %}
+{% block title %}Dashboard Overview{% endblock %}
+{% block dashboard_content %}
+<h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">Welcome back, {{ user.username }}! 👋</h2>
+
+<div class="dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-icon">📝</div>
+    <div class="stat-value">{{ blog_count }}</div>
+    <div class="stat-name">Blog Posts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🖼</div>
+    <div class="stat-value">{{ photo_count }}</div>
+    <div class="stat-name">Gallery Photos</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">💬</div>
+    <div class="stat-value">{{ message_count }}</div>
+    <div class="stat-name">Messages</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🔔</div>
+    <div class="stat-value">{{ unread_count }}</div>
+    <div class="stat-name">Unread</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+  <div class="dashboard-card">
+    <h3>Recent Blog Posts</h3>
+    {% for blog in recent_blogs %}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-glass)">
+      <div>
+        <p style="color:var(--white);font-size:.9rem">{{ blog.title|truncatewords:8 }}</p>
+        <p style="color:var(--text-muted);font-size:.75rem">{{ blog.published_date|date:"d M Y" }}</p>
+      </div>
+      <a href="{% url 'blog_edit' blog.pk %}" class="btn btn-sm btn-outline">Edit</a>
+    </div>
+    {% empty %}
+    <p style="color:var(--text-muted)">No posts yet.</p>
+    {% endfor %}
+    <a href="{% url 'blog_create' %}" class="btn btn-primary btn-sm" style="margin-top:16px">+ New Blog</a>
+  </div>
+
+  <div class="dashboard-card">
+    <h3>Recent Messages</h3>
+    {% for msg in recent_messages %}
+    <div style="padding:10px 0;border-bottom:1px solid var(--border-glass)">
+      <p style="color:var(--white);font-size:.9rem">{{ msg.name }}</p>
+      <p style="color:var(--text-muted);font-size:.8rem">{{ msg.message|truncatewords:12 }}</p>
+      <a href="{% url 'message_detail' msg.pk %}" style="color:var(--accent);font-size:.8rem">Read →</a>
+    </div>
+    {% empty %}
+    <p style="color:var(--text-muted)">No unread messages.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
