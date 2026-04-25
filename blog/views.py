@@ -1,9 +1,12 @@
+import base64
+import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.db.models import Q, Count
+from django.core.files.base import ContentFile
 from .models import BlogPost, GalleryPhoto, ContactMessage, Category, SiteProfile
 from .forms import BlogPostForm, GalleryPhotoForm, ContactForm, CategoryForm
 
@@ -279,7 +282,6 @@ def message_delete(request, pk):
 # Profile
 @login_required
 def edit_profile(request):
-    """Edit site profile info."""
     profile = SiteProfile.load()
     if request.method == 'POST':
         profile.name = request.POST.get('name', profile.name)
@@ -290,8 +292,18 @@ def edit_profile(request):
         profile.phone = request.POST.get('phone', profile.phone)
         profile.location = request.POST.get('location', profile.location)
         profile.education = request.POST.get('education', profile.education)
-        if 'profile_image' in request.FILES:
+
+        # Cropped image arrives as base64 data URL from Cropper.js
+        cropped_data = request.POST.get('cropped_image', '').strip()
+        if cropped_data and cropped_data.startswith('data:image'):
+            header, imgstr = cropped_data.split(';base64,', 1)
+            ext = header.split('/')[-1]
+            ext = 'jpg' if ext in ('jpeg', 'jpg') else ext if ext in ('png', 'webp', 'gif') else 'jpg'
+            filename = f"profile_{uuid.uuid4().hex[:10]}.{ext}"
+            profile.profile_image.save(filename, ContentFile(base64.b64decode(imgstr)), save=False)
+        elif 'profile_image' in request.FILES:
             profile.profile_image = request.FILES['profile_image']
+
         profile.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('edit_profile')
