@@ -5,189 +5,332 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
-  /* ── Cropper Modal ── */
-  .crop-modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.85);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .crop-modal-overlay.open { display: flex; }
+/* ─── Cropper DOM overrides ─────────────────────── */
+.cropper-view-box {
+  border-radius: 50% !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px #e2b04a, 0 0 0 4000px rgba(0,0,0,.55) !important;
+}
+.cropper-face {
+  border-radius: 50% !important;
+  background: transparent !important;
+}
+.cropper-dashed,
+.cropper-point,
+.cropper-line { display: none !important; }
 
-  .crop-modal {
-    background: var(--primary-light);
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius);
-    width: 100%;
-    max-width: 560px;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .crop-modal h3 {
-    color: var(--white);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    margin: 0;
-  }
-  .crop-modal p {
-    color: var(--text-muted);
-    font-size: .85rem;
-    margin: -12px 0 0;
-  }
+/* ─── Modal overlay ─────────────────────────────── */
+#cpOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+#cpOverlay.open { display: flex; }
 
-  /* Cropper image area */
-  .crop-image-wrap {
-    width: 100%;
-    height: 320px;
-    background: #000;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-  }
-  .crop-image-wrap img { display: block; max-width: 100%; }
+/* ─── Card ──────────────────────────────────────── */
+.cp-card {
+  background: #16213e;
+  border: 1px solid rgba(226,176,74,.22);
+  border-radius: 18px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.7);
+  animation: cpIn .22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes cpIn {
+  from { opacity:0; transform:translateY(14px) scale(.97); }
+  to   { opacity:1; transform:translateY(0)    scale(1);   }
+}
 
-  /* Zoom & rotate controls */
-  .crop-controls {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .crop-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 18px;
-    border-radius: var(--radius-sm);
-    font-size: .85rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid var(--border-glass);
-    background: var(--bg-glass);
-    color: var(--text);
-    transition: var(--transition);
-  }
-  .crop-btn:hover { background: rgba(226,176,74,.15); border-color: var(--accent); color: var(--accent); }
+/* ─── Header ─────────────────────────────────────── */
+.cp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.cp-header h3 {
+  margin: 0;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.cp-header p {
+  margin: 2px 0 0;
+  color: rgba(255,255,255,.35);
+  font-size: .75rem;
+}
+.cp-x {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  border: none;
+  color: rgba(255,255,255,.6);
+  font-size: .95rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.cp-x:hover { background: rgba(248,113,113,.25); color: #f87171; }
 
-  .crop-actions { display: flex; gap: 12px; }
-  .crop-actions .btn { flex: 1; justify-content: center; }
+/* ─── Body ───────────────────────────────────────── */
+.cp-body {
+  display: flex;
+  height: 350px;
+}
 
-  /* ── Profile photo preview ── */
-  .profile-photo-wrap {
-    position: relative;
-    width: 110px;
-    height: 110px;
-    flex-shrink: 0;
-    cursor: pointer;
-  }
-  .profile-photo-wrap img {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--accent);
-    display: block;
-  }
-  .profile-photo-overlay {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: rgba(0,0,0,.55);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition);
-    gap: 4px;
-  }
-  .profile-photo-wrap:hover .profile-photo-overlay { opacity: 1; }
-  .profile-photo-overlay span { font-size: 1.4rem; }
-  .profile-photo-overlay p { color: #fff; font-size: .7rem; font-weight: 600; margin: 0; font-family: 'Inter', sans-serif; }
+/* Left — main crop canvas */
+.cp-canvas {
+  flex: 1;
+  background: #0a0a12;
+  overflow: hidden;
+  min-width: 0;
+}
+.cp-canvas img { display: block; max-width: 100%; }
 
-  /* Zoom range slider */
-  .zoom-slider-wrap { display: flex; align-items: center; gap: 12px; }
-  .zoom-slider-wrap label { color: var(--text-muted); font-size: .8rem; white-space: nowrap; }
-  .zoom-slider {
-    flex: 1;
-    accent-color: var(--accent);
-    cursor: pointer;
-  }
+/* Right — live preview panel */
+.cp-sidebar {
+  width: 148px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 20px 14px;
+  background: rgba(0,0,0,.3);
+  border-left: 1px solid rgba(255,255,255,.06);
+}
+.cp-pv-label {
+  font-size: .64rem;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+.cp-pv-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.cp-pv-ring {
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(226,176,74,.55);
+  background: #111;
+  flex-shrink: 0;
+}
+.cp-pv-ring.lg  { width: 86px;  height: 86px;  }
+.cp-pv-ring.sm  { width: 42px;  height: 42px;  }
+.cp-pv-ring p   { margin: 0; font-size: .62rem; color: rgba(255,255,255,.28); }
+
+/* ─── Footer ─────────────────────────────────────── */
+.cp-footer {
+  padding: 13px 20px 16px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.18);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+/* Zoom bar */
+.cp-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cp-zoom-icon {
+  color: rgba(255,255,255,.38);
+  font-size: .9rem;
+  cursor: pointer;
+  padding: 4px 2px;
+  user-select: none;
+  transition: color .15s;
+  line-height: 1;
+}
+.cp-zoom-icon:hover { color: #e2b04a; }
+.cp-zoom-icon.lg { font-size: 1.05rem; }
+
+.cp-slider-wrap {
+  flex: 1;
+  position: relative;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+.cp-track {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: rgba(255,255,255,.1);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.cp-fill {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #e2b04a, #f0c66e);
+  border-radius: 3px;
+  pointer-events: none;
+  transition: width .05s;
+}
+input[type=range]#cpZoom {
+  position: relative;
+  z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  outline: none;
+  margin: 0;
+  cursor: pointer;
+}
+input[type=range]#cpZoom::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid #e2b04a;
+  box-shadow: 0 2px 8px rgba(0,0,0,.45);
+  transition: transform .12s;
+}
+input[type=range]#cpZoom::-webkit-slider-thumb:hover { transform: scale(1.25); }
+input[type=range]#cpZoom::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid #e2b04a;
+  cursor: pointer;
+}
+
+/* Tools + CTA row */
+.cp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cp-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.cp-tool {
+  padding: 6px 12px;
+  font-size: .75rem;
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.cp-tool:hover {
+  background: rgba(226,176,74,.12);
+  border-color: rgba(226,176,74,.35);
+  color: #e2b04a;
+}
+.cp-cta { display: flex; gap: 8px; }
+
+/* ─── Avatar ring on profile form ───────────────── */
+.av-wrap {
+  position: relative;
+  width: 96px; height: 96px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.av-wrap img {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2b04a;
+  display: block;
+  transition: filter .2s;
+}
+.av-wrap:hover img { filter: brightness(.65); }
+.av-badge {
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 26px; height: 26px;
+  background: #e2b04a;
+  border: 2px solid #16213e;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem;
+  pointer-events: none;
+}
+
+/* ─── Mobile ─────────────────────────────────────── */
+@media (max-width: 580px) {
+  .cp-sidebar { display: none; }
+  .cp-body    { height: 270px; }
+  .cp-card    { border-radius: 14px; }
+  .cp-tools   { display: none; }
+}
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
 <div class="form-page">
   <h2 style="color:var(--white);margin-bottom:24px;font-family:'Playfair Display',serif">👤 Edit Site Profile</h2>
-
   <div class="dashboard-card">
     <form method="POST" enctype="multipart/form-data" id="profileForm">
       {% csrf_token %}
-      <!-- Hidden fields for cropped result -->
-      <input type="hidden" name="cropped_image" id="croppedImageInput">
+      <input type="hidden" name="cropped_image" id="croppedData">
 
-      <!-- ── Profile Photo Uploader ── -->
+      <!-- ── Avatar upload row ── -->
       <div class="form-group">
         <label>Profile Photo</label>
-        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
-
-          <!-- Clickable avatar -->
-          <div class="profile-photo-wrap" onclick="document.getElementById('rawImageInput').click()" title="Click to change photo">
-            <img id="currentProfilePhoto"
+        <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+          <div class="av-wrap" onclick="document.getElementById('cpFileInput').click()" title="Click to change photo">
+            <img id="avPreview"
               src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'images/profile.jpg' %}{% endif %}"
               alt="Profile Photo">
-            <div class="profile-photo-overlay">
-              <span>📷</span>
-              <p>Change</p>
-            </div>
+            <div class="av-badge">✏️</div>
           </div>
-
           <div>
             <button type="button" class="btn btn-outline btn-sm"
-                    onclick="document.getElementById('rawImageInput').click()">
+                    onclick="document.getElementById('cpFileInput').click()">
               📁 Choose Photo
             </button>
-            <p style="color:var(--text-muted);font-size:.78rem;margin-top:8px">
-              JPG, PNG, WebP, HEIC supported<br>
-              Click avatar or button → crop &amp; zoom → save
+            <p style="color:var(--text-muted);font-size:.78rem;margin-top:8px;line-height:1.7">
+              JPG · PNG · WebP · HEIC supported<br>
+              Crop editor opens automatically
             </p>
           </div>
         </div>
-        <!-- Hidden raw file input — triggers cropper -->
-        <input type="file" id="rawImageInput" accept="image/*" style="display:none">
+        <input type="file" id="cpFileInput" accept="image/*" style="display:none">
       </div>
 
-      <hr style="border-color:var(--border-glass);margin:8px 0 24px">
+      <hr style="border-color:var(--border-glass);margin:4px 0 24px">
 
-      <!-- ── Text fields ── -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="form-group">
           <label>Full Name *</label>
-          <input type="text" name="name" value="{{ profile.name }}" class="form-input"
-                 placeholder="Mr. Raju Maurya" required>
+          <input type="text" name="name" value="{{ profile.name }}" class="form-input" required>
         </div>
         <div class="form-group">
           <label>Title / Role *</label>
-          <input type="text" name="title" value="{{ profile.title }}" class="form-input"
-                 placeholder="Student | Blogger" required>
+          <input type="text" name="title" value="{{ profile.title }}" class="form-input" required>
         </div>
       </div>
 
       <div class="form-group">
         <label>Tagline / Quote</label>
-        <input type="text" name="tagline" value="{{ profile.tagline }}" class="form-input"
-               placeholder="A short inspirational tagline">
+        <input type="text" name="tagline" value="{{ profile.tagline }}" class="form-input">
       </div>
 
       <div class="form-group">
         <label>About Text</label>
-        <textarea name="about_text" rows="5" class="form-input"
-                  placeholder="Write a short bio...">{{ profile.about_text }}</textarea>
+        <textarea name="about_text" rows="5" class="form-input">{{ profile.about_text }}</textarea>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -221,43 +364,68 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     CROPPER MODAL
-═══════════════════════════════════════════ -->
-<div class="crop-modal-overlay" id="cropModal">
-  <div class="crop-modal">
-    <div>
-      <h3>✂️ Adjust Profile Photo</h3>
-      <p>Drag to position • Scroll or use buttons to zoom • Pinch on mobile</p>
+<!-- ═══════════════════════════════════
+     CROP MODAL
+═══════════════════════════════════ -->
+<div id="cpOverlay">
+  <div class="cp-card">
+
+    <!-- Header -->
+    <div class="cp-header">
+      <div>
+        <h3>Crop Profile Photo</h3>
+        <p>Drag to position &nbsp;·&nbsp; Scroll or slide to zoom &nbsp;·&nbsp; Pinch on mobile</p>
+      </div>
+      <button class="cp-x" id="cpClose">✕</button>
     </div>
 
-    <!-- Image to crop -->
-    <div class="crop-image-wrap">
-      <img id="cropperImg" src="" alt="Crop preview">
+    <!-- Body -->
+    <div class="cp-body">
+      <div class="cp-canvas">
+        <img id="cpImg" src="" alt="">
+      </div>
+      <div class="cp-sidebar">
+        <span class="cp-pv-label">Preview</span>
+        <div class="cp-pv-item">
+          <div class="cp-pv-ring lg cp-preview" id="pvLg"></div>
+          <p>Profile</p>
+        </div>
+        <div class="cp-pv-item">
+          <div class="cp-pv-ring sm cp-preview" id="pvSm"></div>
+          <p>Small</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Zoom slider -->
-    <div class="zoom-slider-wrap">
-      <label>🔍 Zoom</label>
-      <input type="range" class="zoom-slider" id="zoomSlider"
-             min="0" max="3" step="0.01" value="0">
+    <!-- Footer -->
+    <div class="cp-footer">
+
+      <!-- Zoom slider -->
+      <div class="cp-zoom-row">
+        <span class="cp-zoom-icon"    id="cpZoomOut" title="Zoom out">🔍</span>
+        <div class="cp-slider-wrap">
+          <div class="cp-track"></div>
+          <div class="cp-fill" id="cpFill"></div>
+          <input type="range" id="cpZoom" min="0" max="100" value="0" step="1">
+        </div>
+        <span class="cp-zoom-icon lg" id="cpZoomIn"  title="Zoom in">🔍</span>
+      </div>
+
+      <!-- Tools + apply -->
+      <div class="cp-actions">
+        <div class="cp-tools">
+          <button type="button" class="cp-tool" id="cpRotL">↺ Rotate L</button>
+          <button type="button" class="cp-tool" id="cpRotR">↻ Rotate R</button>
+          <button type="button" class="cp-tool" id="cpFlip">↔ Flip</button>
+          <button type="button" class="cp-tool" id="cpReset">⟳ Reset</button>
+        </div>
+        <div class="cp-cta">
+          <button type="button" class="btn btn-outline btn-sm" id="cpCancel">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="cpApply">Set Photo ✓</button>
+        </div>
+      </div>
     </div>
 
-    <!-- Control buttons -->
-    <div class="crop-controls">
-      <button type="button" class="crop-btn" id="zoomIn">🔍+ Zoom In</button>
-      <button type="button" class="crop-btn" id="zoomOut">🔍− Zoom Out</button>
-      <button type="button" class="crop-btn" id="rotateLeft">↺ Rotate Left</button>
-      <button type="button" class="crop-btn" id="rotateRight">↻ Rotate Right</button>
-      <button type="button" class="crop-btn" id="flipH">↔ Flip H</button>
-      <button type="button" class="crop-btn" id="resetCrop">↺ Reset</button>
-    </div>
-
-    <!-- Apply / Cancel -->
-    <div class="crop-actions">
-      <button type="button" class="btn btn-primary" id="applyCrop">✅ Apply Photo</button>
-      <button type="button" class="btn btn-outline" id="cancelCrop">Cancel</button>
-    </div>
   </div>
 </div>
 {% endblock %}
@@ -266,90 +434,156 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
 (function () {
-  const rawInput    = document.getElementById('rawImageInput');
-  const cropModal   = document.getElementById('cropModal');
-  const cropperImg  = document.getElementById('cropperImg');
-  const croppedInput = document.getElementById('croppedImageInput');
-  const previewImg  = document.getElementById('currentProfilePhoto');
-  const zoomSlider  = document.getElementById('zoomSlider');
+  'use strict';
 
-  let cropper = null;
-  let currentZoom = 0;
+  /* ── DOM refs ─────────────────────────────────── */
+  const fileInput   = document.getElementById('cpFileInput');
+  const overlay     = document.getElementById('cpOverlay');
+  const cpImg       = document.getElementById('cpImg');
+  const croppedData = document.getElementById('croppedData');
+  const avPreview   = document.getElementById('avPreview');
+  const zoomSlider  = document.getElementById('cpZoom');
+  const fillBar     = document.getElementById('cpFill');
 
-  // Open cropper when file is chosen
-  rawInput.addEventListener('change', function () {
-    if (!this.files || !this.files[0]) return;
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      cropperImg.src = e.target.result;
-      cropModal.classList.add('open');
-      document.body.style.overflow = 'hidden';
+  let cropper   = null;
+  let fitZoom   = 0.1;   // initial "fit" ratio — set in ready()
 
-      // Destroy old instance if any
-      if (cropper) { cropper.destroy(); cropper = null; }
+  /* ── Helpers ──────────────────────────────────── */
+  const minZoomMult = 0.9;   // 0.9× fit
+  const maxZoomMult = 4.0;   // 4× fit
 
-      cropper = new Cropper(cropperImg, {
-        aspectRatio: 1,          // Square crop → circular avatar
-        viewMode: 1,             // Keep image inside box
-        dragMode: 'move',
-        autoCropArea: 0.85,
-        restore: false,
-        guides: true,
-        center: true,
-        highlight: false,
-        cropBoxMovable: false,   // Fixed crop box — user moves image
-        cropBoxResizable: false,
-        toggleDragModeOnDblclick: false,
-        zoom(e) {
-          currentZoom = e.detail.ratio;
-          zoomSlider.value = currentZoom;
-        },
-      });
-    };
-    reader.readAsDataURL(this.files[0]);
-  });
-
-  // Zoom slider
-  zoomSlider.addEventListener('input', function () {
-    if (cropper) cropper.zoomTo(parseFloat(this.value));
-  });
-
-  // Buttons
-  document.getElementById('zoomIn').addEventListener('click',  () => cropper && cropper.zoom(0.1));
-  document.getElementById('zoomOut').addEventListener('click', () => cropper && cropper.zoom(-0.1));
-  document.getElementById('rotateLeft').addEventListener('click',  () => cropper && cropper.rotate(-90));
-  document.getElementById('rotateRight').addEventListener('click', () => cropper && cropper.rotate(90));
-  document.getElementById('flipH').addEventListener('click', () => {
-    if (!cropper) return;
-    const d = cropper.getData();
-    cropper.scaleX(d.scaleX === -1 ? 1 : -1);
-  });
-  document.getElementById('resetCrop').addEventListener('click', () => cropper && cropper.reset());
-
-  // Apply — export canvas as base64, show preview, close modal
-  document.getElementById('applyCrop').addEventListener('click', function () {
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingQuality: 'high' });
-    const dataURL = canvas.toDataURL('image/jpeg', 0.92);
-
-    croppedInput.value = dataURL;          // Will be submitted with the form
-    previewImg.src = dataURL;             // Live preview in avatar
-    closeCropModal();
-  });
-
-  // Cancel
-  document.getElementById('cancelCrop').addEventListener('click', closeCropModal);
-
-  // Close on overlay click
-  cropModal.addEventListener('click', function (e) {
-    if (e.target === cropModal) closeCropModal();
-  });
-
-  function closeCropModal() {
-    cropModal.classList.remove('open');
-    document.body.style.overflow = '';
-    rawInput.value = '';               // Reset so same file can be re-selected
+  function zoomToSlider(ratio) {
+    const min = fitZoom * minZoomMult;
+    const max = fitZoom * maxZoomMult;
+    return Math.min(100, Math.max(0, Math.round(((ratio - min) / (max - min)) * 100)));
   }
+  function sliderToZoom(pct) {
+    const min = fitZoom * minZoomMult;
+    const max = fitZoom * maxZoomMult;
+    return min + (pct / 100) * (max - min);
+  }
+  function setFill(pct) {
+    fillBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  }
+
+  /* ── Init cropper ─────────────────────────────── */
+  function initCropper(src) {
+    cpImg.src = src;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    if (cropper) { cropper.destroy(); cropper = null; }
+
+    cropper = new Cropper(cpImg, {
+      aspectRatio   : 1,
+      viewMode      : 1,
+      dragMode      : 'move',
+      autoCropArea  : 0.82,
+      cropBoxMovable   : false,
+      cropBoxResizable : false,
+      toggleDragModeOnDblclick: false,
+      guides        : false,
+      center        : false,
+      highlight     : false,
+      preview       : '.cp-preview',
+
+      ready() {
+        /* Apply circular crop-box via DOM ───────── */
+        const wrap = cpImg.parentElement;
+        const vb = wrap.querySelector('.cropper-view-box');
+        const fc = wrap.querySelector('.cropper-face');
+        if (vb) {
+          vb.style.cssText += 'border-radius:50%!important;outline:none!important;box-shadow:0 0 0 2px #e2b04a,0 0 0 4000px rgba(0,0,0,.52)!important;';
+        }
+        if (fc) fc.style.cssText += 'border-radius:50%!important;background:transparent!important;';
+        wrap.querySelectorAll('.cropper-dashed,.cropper-point,.cropper-line')
+            .forEach(el => el.style.display = 'none');
+
+        /* Record fit zoom, set slider ────────────── */
+        const d = cropper.getImageData();
+        fitZoom = d.width / d.naturalWidth;
+
+        const initPct = zoomToSlider(fitZoom);
+        zoomSlider.value = initPct;
+        setFill(initPct);
+      },
+
+      zoom(e) {
+        const pct = zoomToSlider(e.detail.ratio);
+        zoomSlider.value = pct;
+        setFill(pct);
+      },
+    });
+  }
+
+  /* ── File selected → open cropper ────────────── */
+  fileInput.addEventListener('change', function () {
+    const file = this.files && this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => initCropper(e.target.result);
+    reader.readAsDataURL(file);
+  });
+
+  /* ── Zoom slider ──────────────────────────────── */
+  zoomSlider.addEventListener('input', function () {
+    if (cropper) cropper.zoomTo(sliderToZoom(+this.value));
+    setFill(+this.value);
+  });
+  document.getElementById('cpZoomIn') .addEventListener('click', () => cropper && cropper.zoom( 0.08));
+  document.getElementById('cpZoomOut').addEventListener('click', () => cropper && cropper.zoom(-0.08));
+
+  /* ── Tool buttons ─────────────────────────────── */
+  document.getElementById('cpRotL') .addEventListener('click', () => cropper && cropper.rotate(-90));
+  document.getElementById('cpRotR') .addEventListener('click', () => cropper && cropper.rotate(90));
+  document.getElementById('cpFlip') .addEventListener('click', () => {
+    if (!cropper) return;
+    cropper.scaleX(cropper.getData().scaleX === -1 ? 1 : -1);
+  });
+  document.getElementById('cpReset').addEventListener('click', () => {
+    if (!cropper) return;
+    cropper.reset();
+    const pct = zoomToSlider(fitZoom);
+    zoomSlider.value = pct;
+    setFill(pct);
+  });
+
+  /* ── Apply ─────────────────────────────────────── */
+  document.getElementById('cpApply').addEventListener('click', function () {
+    if (!cropper) return;
+
+    // Show loading state
+    this.textContent = 'Processing…';
+    this.disabled = true;
+
+    const canvas = cropper.getCroppedCanvas({
+      width: 400, height: 400,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high',
+    });
+
+    const dataURL = canvas.toDataURL('image/jpeg', 0.92);
+    croppedData.value = dataURL;
+    avPreview.src     = dataURL;          // Instant live avatar update
+
+    this.textContent = 'Set Photo ✓';
+    this.disabled = false;
+    closeModal();
+  });
+
+  /* ── Close / cancel ───────────────────────────── */
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    fileInput.value = '';
+  }
+  document.getElementById('cpCancel').addEventListener('click', closeModal);
+  document.getElementById('cpClose') .addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+  /* ── Keyboard ESC ─────────────────────────────── */
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal(); });
+
 })();
 </script>
 {% endblock %}
